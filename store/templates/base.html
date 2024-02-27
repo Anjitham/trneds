@@ -12,6 +12,11 @@
     />
     <!-- Custom StyleSheet -->
     <link rel="stylesheet" href="{%static 'css/styles.css'%}" />
+    {%block link_block%}
+
+    {%endblock%}
+
+    
     <title>Boy’s T-Shirt</title>
   </head>
 
@@ -121,9 +126,10 @@
     </footer>
     <!-- Custom Script -->
     <script src="{%static 'js/index.js'%}"></script>
-    {%block script_block%}
+
+  </body>
+{%block script_block%}
 
     
-    {%endblock%}
-  </body>
+{%endblock%}
 </html>
