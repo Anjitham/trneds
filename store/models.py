@@ -49,9 +49,11 @@ class BasketItem(models.Model):
     product_object=models.ForeignKey(Product,on_delete=models.CASCADE)
     qty=models.PositiveIntegerField(default=1)
     basket_object=models.ForeignKey(Basket,on_delete=models.CASCADE,related_name="cartitem")
+    Size_object=models.ForeignKey(Size,on_delete=models.CASCADE,null=True)
     created_date=models.DateTimeField(auto_now_add=True)
     updated_date=models.DateTimeField(auto_now=True)
     is_active=models.BooleanField(default=True)
+    is_order_placed=models.BooleanField(default=False,)
 
 # default basket creation
 def create_basket(sender,instance,created,**kwargs):

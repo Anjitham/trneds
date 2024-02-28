@@ -3,7 +3,7 @@ from django.views.generic import View,TemplateView
 from store.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from store.models import Product
+from store.models import Product,BasketItem,Size
 
 # lh:8000/register/
 # get,post
@@ -60,4 +60,34 @@ class ProductDetailview(View):
         
 class HomeView(TemplateView):
  
-     template_name="base.html"
+    template_name="base.html"
+
+# lh:8000/products/{id}/ad_to_cart
+#  post
+     
+class AddToBasketView(View):
+    
+    def post(self,request,*args,**kwargs):
+        size=request.POST.get("size")
+        size_obj=Size.objects.get(name=size)
+        qty=request.POST.get("qty")
+        id=kwargs.get("pk")
+        product_obj=Product.objects.get(id=id)
+        BasketItem.objects.create(
+            Size_object=size_obj,
+            qty=qty,
+            product_object=product_obj,
+            basket_object=request.user.cart
+        )
+
+        return redirect("index")
+    
+# lh:8000/basket/items/all
+# method:get
+    
+class BasketItemListView(View):
+
+    def get(self,request,*args,**kwargs):
+        qs=request.user.cart.cartitem.filter(is_order_placed=False)
+
+        return render (request,"cart_list.html",{"data":qs})
