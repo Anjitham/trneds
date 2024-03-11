@@ -8,6 +8,10 @@ from django.views.decorators.cache import never_cache
 from store.decorators import signin_required,owner_permission_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
+import razorpay
+
+KEY_ID=""
+KEY_SECRET=""
 
 
 
@@ -147,12 +151,17 @@ class CheckOutView(View):
         email=request.POST.get("email")
         phone=request.POST.get("phone")
         address=request.POST.get("address")
+        payment_method=request.POST.get("payment")
+
+        # creating order instance
+
         order_obj=Order.objects.create(
             user_object=request.user,
             delivery_address=address,
             phone=phone,
             email=email,
-            total=request.user.cart.basket_total
+            total=request.user.cart.basket_total,
+            payment=payment_method
         )
 
         # creating order_item_instance
@@ -169,7 +178,11 @@ class CheckOutView(View):
             order_obj.delete()
 
         finally:
-            print(email,phone,address)
+            if payment_method=="online" and order_obj:
+                client = razorpay.Client(auth=(KEY_ID, KEY_SECRET))
+                data = { "amount": order_obj.get_order_total*100, "currency": "INR", "receipt": "order_rcptid_11" }
+                payment = client.order.create(data=data)
+                print("payment initiative:",payment)
             return redirect("index")
 
 
@@ -185,7 +198,7 @@ class SignOutView(View):
 class OrderSummaryView(View):
         
         def get(self,request,*args,**kwargs):
-            qs=Order.objects.filter(user_object=request.user)
+            qs=Order.objects.filter(user_object=request.user).exclude(status="cancelled")
             return  render(request,"order_summary.html",{"data":qs})
             
     
