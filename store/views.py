@@ -9,15 +9,7 @@ from store.decorators import signin_required,owner_permission_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 
-# # signin required
-# def signin_required(fn):
 
-#     def wrapper(request,*args,**kwargs):
-#         if not request.user.is_authenticated:
-#              return redirect("signin")
-#         else:
-#             return fn(request,*args,**kwargs)
-#     return wrapper
 
 # decs=[signin_required,never_cache]
 
@@ -188,7 +180,8 @@ class SignOutView(View):
     def get(self,request,*args,**kwargs):
         logout(request)
         return redirect("signin")
-
+# ordersummary
+# lh:8000/
 class OrderSummaryView(View):
         
         def get(self,request,*args,**kwargs):
@@ -196,7 +189,13 @@ class OrderSummaryView(View):
             return  render(request,"order_summary.html",{"data":qs})
             
     
-    
+class OrderitemRemove(View):
+        
+        def get(self,request,*args,**kwargs):
+            id=kwargs.get("pk")
+            OrderItems.objects.get(id=id).delete()
+            return redirect("order-summary")
+
     
 
     

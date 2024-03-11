@@ -86,7 +86,13 @@ class Order(models.Model):
     
     @property
     def get_order_items(self):
-        return self.purcahseitems.all()
+        return self.purchaseitems.all()
+    @property
+    def get_order_total(self):
+        purchase_items=self.get_order_items
+        order_total=0
+        if purchase_items:
+            order_total={pi.basket_item_object.item_total for pi in purchase_items}
 
 class OrderItems(models.Model):
     order_object=models.ForeignKey(Order,on_delete=models.CASCADE,related_name="purchaseitems")
