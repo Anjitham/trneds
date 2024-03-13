@@ -34,5 +34,6 @@ urlpatterns = [
     path("checkout/",views.CheckOutView.as_view(),name="checkout"),
     path("signout/",views.SignOutView.as_view(),name="signout"),
     path("orders/summary/",views.OrderSummaryView.as_view(),name="order-summary"),
-    path("orders/item/<int:pk>/remove/",views.OrderitemRemove.as_view(),name="order-item-remove")
+    path("orders/item/<int:pk>/remove/",views.OrderitemRemove.as_view(),name="order-item-remove"),
+    path("payment/verification/",views.PaymentVerificationView.as_view(),name="payment-verification")
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

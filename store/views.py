@@ -9,9 +9,10 @@ from store.decorators import signin_required,owner_permission_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 import razorpay
+from django.views.decorators.csrf import csrf_exempt
 
-KEY_ID=""
-KEY_SECRET=""
+KEY_ID="rzp_test_nIHt0Xftg4w37E"
+KEY_SECRET="1G0t5Bv9AVY5H3KgUMowFriQ"
 
 
 
@@ -139,6 +140,7 @@ class CartItemUpdateQtyView(View):
             
         return redirect ("basket-items")
     
+# lh:8000/checkout/
 
 @method_decorator([signin_required,never_cache],name="dispatch")      
 class CheckOutView(View):
@@ -192,28 +194,39 @@ class CheckOutView(View):
             return redirect("index")
 
 
-# signout  
+# lh:8000/signout/ 
 @method_decorator([signin_required,never_cache],name="dispatch")      
 class SignOutView(View):
 
     def get(self,request,*args,**kwargs):
         logout(request)
         return redirect("signin")
+
 # ordersummary
-# lh:8000/
+# lh:8000/orders/summary/
 class OrderSummaryView(View):
         
         def get(self,request,*args,**kwargs):
             qs=Order.objects.filter(user_object=request.user).exclude(status="cancelled")
             return  render(request,"order_summary.html",{"data":qs})
             
-    
+# lh:8000/orders/item/<int:pk>/remove/    
+# method:get
 class OrderitemRemove(View):
         
         def get(self,request,*args,**kwargs):
             id=kwargs.get("pk")
             OrderItems.objects.get(id=id).delete()
             return redirect("order-summary")
+
+# lh:8000/payment/verification/
+# method:post  
+
+@method_decorator(csrf_exempt,name="dispatch") 
+class PaymentVerificationView(View):
+    def post(self,request,*args,**kwargs):
+        print("=========",request.POST)
+        return render (request,"success.html")
 
     
 
