@@ -3,7 +3,7 @@ from django.views.generic import View,TemplateView
 from store.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from store.models import Product,BasketItem,Size,Order,OrderItems
+from store.models import Product,BasketItem,Size,Order,OrderItems,Category
 from django.views.decorators.cache import never_cache
 from store.decorators import signin_required,owner_permission_required
 from django.utils.decorators import method_decorator
@@ -63,7 +63,11 @@ class IndexView(View):
 
         def get(self,request,*args,**kwargs):
             qs=Product.objects.all()
-            return render(request,"index.html",{"data":qs})
+            category=Category.objects.all()
+            selected_category=request.GET.get("category")
+            if selected_category:
+                qs=qs.filter(category_object__name=selected_category)
+            return render(request,"index.html",{"data":qs,"category":category})
         
 @method_decorator([signin_required,never_cache],name="dispatch")      
 class ProductDetailview(View):
@@ -180,10 +184,15 @@ class CheckOutView(View):
             order_obj.delete()
 
         finally:
+            print(payment_method)
+            print(order_obj)
             if payment_method=="online" and order_obj:
                 client = razorpay.Client(auth=(KEY_ID, KEY_SECRET))
                 data = { "amount": order_obj.get_order_total*100, "currency": "INR", "receipt": "order_rcptid_11" }
+
                 payment = client.order.create(data=data)
+                order_obj.order_id=payment.get("id")
+                order_obj.save()
                 print("payment initiative:",payment)
                 context={
                     "key":KEY_ID,
@@ -224,8 +233,20 @@ class OrderitemRemove(View):
 
 @method_decorator(csrf_exempt,name="dispatch") 
 class PaymentVerificationView(View):
+
     def post(self,request,*args,**kwargs):
-        print("=========",request.POST)
+        client = razorpay.Client(auth=(KEY_ID, KEY_SECRET))
+        data=request.POST
+        try:
+            client.utility.verify_payment_signature(data)
+            print(data)
+            order_obj=Order.objects.get(order_id=data.get("razorpay_order_id"))
+            order_obj.is_paid=True
+            order_obj.save()
+            print("Transaction Successfull*******")
+        except:
+            print("Transaction Failed!!!!!!!!")
+
         return render (request,"success.html")
 
     
