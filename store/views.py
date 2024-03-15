@@ -11,8 +11,8 @@ from django.views.decorators.cache import never_cache
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 
-KEY_ID="rzp_test_nIHt0Xftg4w37E"
-KEY_SECRET="1G0t5Bv9AVY5H3KgUMowFriQ"
+KEY_ID=""
+KEY_SECRET=""
 
 
 
