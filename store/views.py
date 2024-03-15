@@ -3,7 +3,7 @@ from django.views.generic import View,TemplateView
 from store.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from store.models import Product,BasketItem,Size,Order,OrderItems,Category
+from store.models import Product,BasketItem,Size,Order,OrderItems,Category,Tag
 from django.views.decorators.cache import never_cache
 from store.decorators import signin_required,owner_permission_required
 from django.utils.decorators import method_decorator
@@ -64,10 +64,16 @@ class IndexView(View):
         def get(self,request,*args,**kwargs):
             qs=Product.objects.all()
             category=Category.objects.all()
+            tag=Tag.objects.all()
             selected_category=request.GET.get("category")
             if selected_category:
                 qs=qs.filter(category_object__name=selected_category)
-            return render(request,"index.html",{"data":qs,"category":category})
+            return render(request,"index.html",{"data":qs,"category":category,"tag":tag})
+        
+        def post(self,request,*args,**kwargs):
+            tagname=request.POST.get("tag")
+            qs=Product.objects.filter(Tag_object__name=tagname)
+            return render (request,"index.html",{"data":qs})
         
 @method_decorator([signin_required,never_cache],name="dispatch")      
 class ProductDetailview(View):

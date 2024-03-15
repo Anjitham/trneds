@@ -4,7 +4,22 @@
 
 <section class="section all-products" id="products">
     <div class="top container">
-      <h1>All Products</h1>
+
+      <div>
+        <form action="" method="post">
+          {%csrf_token%}
+          <input type="text" name="tag" list="tag">
+          <datalist id="tag">
+            {%for tg in tag%}
+            <option value="{{tg.name}}"></option>
+            {%endfor%}
+          </datalist>
+          <button type="submit">
+              Search
+          </button>
+        </form>
+      </div>
+
     
       <div>
         {%for cat in category%}
